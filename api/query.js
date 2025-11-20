@@ -1,87 +1,121 @@
-import fetch from "node-fetch";
+import axios from "axios";
 
 export default async function handler(req, res) {
-  if (req.method !== "POST")
-    return res.status(405).json({ error: "Method not allowed" });
+  if (req.method !== "POST") {
+    return res.status(405).json({ success: false, error: "Method Not Allowed" });
+  }
+
+  const { model, prompt } = req.body;
+
+  if (!model || !prompt) {
+    return res.status(400).json({ success: false, error: "Missing model or prompt" });
+  }
+
+  let output = "";
+  let error = null;
 
   try {
-    const { model, prompt } = req.body ?? {};
-
-    if (!model || !prompt)
-      return res
-        .status(400)
-        .json({ error: "Missing model or prompt", success: false });
-
-    let output = "";
-    let error = null;
-
-    // ----- GROQ (DeepSeek, Groq, Gemma, Llama all use Groq API) -----
-    if (["openai", "deepseek", "groq"].includes(model)) {
-      if (!process.env.GROQ_API_KEY) {
-        error = "GROQ_API_KEY missing";
-      } else {
-        const groqModel =
-          model === "openai"
-            ? "llama-3.1-8b-instant"
-            : model === "deepseek"
-            ? "llama-3.1-70b-versatile"
-            : "llama-3.1-70b-versatile";
-
+    // ────────────────────────────────
+    // 1️⃣ OPENAI (using Groq free model)
+    // ────────────────────────────────
+    if (model === "openai") {
+      if (!process.env.GROQ_API_KEY) error = "GROQ_API_KEY missing";
+      else {
         try {
-          const r = await fetch(
+          const r = await axios.post(
             "https://api.groq.com/openai/v1/chat/completions",
             {
-              method: "POST",
-              headers: {
-                Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-                "Content-Type": "application/json",
-              },
-              body: JSON.stringify({
-                model: groqModel,
-                messages: [{ role: "user", content: prompt }],
-              }),
+              model: "llama-3.1-8b-instant",
+              messages: [{ role: "user", content: prompt }],
+            },
+            {
+              headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+              timeout: 30000,
             }
           );
 
-          const data = await r.json();
-          output =
-            data.choices?.[0]?.message?.content ||
-            data?.error?.message ||
-            "No response";
+          output = r.data.choices?.[0]?.message?.content || "No response from Groq (OpenAI mode)";
         } catch (e) {
-          error = "Groq API error: " + e.message;
+          error = "OpenAI (Groq) error: " + (e.response?.data?.error?.message || e.message);
         }
       }
     }
 
-    // ----- GEMINI -----
+    // ────────────────────────────────
+    // 2️⃣ GOOGLE GEMINI
+    // ────────────────────────────────
     else if (model === "gemini") {
-      if (!process.env.GEMINI_API_KEY) {
-        error = "GEMINI_API_KEY missing";
-      } else {
+      if (!process.env.GEMINI_API_KEY) error = "GEMINI_API_KEY missing";
+      else {
         try {
-          const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`;
+          const r = await axios.post(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`,
+            { contents: [{ parts: [{ text: prompt }] }] },
+            { timeout: 30000 }
+          );
 
-          const r = await fetch(url, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: prompt }] }],
-            }),
-          });
-
-          const data = await r.json();
-          output =
-            data.candidates?.[0]?.content?.parts?.[0]?.text ||
-            data?.error?.message ||
-            "No response";
+          output = r.data.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
         } catch (e) {
-          error = "Gemini API error: " + e.message;
+          error = "Gemini error: " + (e.response?.data?.error?.message || e.message);
         }
       }
     }
 
-    // ----- UNKNOWN MODEL -----
+    // ────────────────────────────────
+    // 3️⃣ DEEPSEEK (via Groq)
+    // ────────────────────────────────
+    else if (model === "deepseek") {
+      if (!process.env.GROQ_API_KEY) error = "GROQ_API_KEY missing";
+      else {
+        try {
+          const r = await axios.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              model: "llama-3.3-70b-versatile",
+              messages: [{ role: "user", content: prompt }],
+            },
+            {
+              headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+              timeout: 30000,
+            }
+          );
+
+          output = r.data.choices?.[0]?.message?.content || "No response";
+        } catch (e) {
+          error = "DeepSeek error: " + (e.response?.data?.error?.message || e.message);
+        }
+      }
+    }
+
+    // ────────────────────────────────
+    // 4️⃣ GROQ
+    // ────────────────────────────────
+    else if (model === "groq") {
+      if (!process.env.GROQ_API_KEY) error = "GROQ_API_KEY missing";
+      else {
+        try {
+          const r = await axios.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            {
+              model: "llama-3.3-70b-versatile",
+              messages: [{ role: "user", content: prompt }],
+            },
+            {
+              headers: { Authorization: `Bearer ${process.env.GROQ_API_KEY}` },
+              timeout: 30000,
+            }
+          );
+
+          output = r.data.choices?.[0]?.message?.content || "No response";
+        } catch (e) {
+          error = "Groq error: " + (e.response?.data?.error?.message || e.message);
+        }
+      }
+    }
+
+    // ────────────────────────────────
+    // UNKNOWN MODEL
+    // ────────────────────────────────
     else {
       error = `Unknown model '${model}'`;
     }
@@ -94,8 +128,9 @@ export default async function handler(req, res) {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    return res
-      .status(500)
-      .json({ success: false, error: "Server error: " + err.message });
+    return res.status(500).json({
+      success: false,
+      error: "Server error: " + err.message,
+    });
   }
 }
