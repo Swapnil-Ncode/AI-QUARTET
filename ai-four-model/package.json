@@ -1,0 +1,29 @@
+{
+  "name": "ai-quartet-fullstack",
+  "version": "1.0.0",
+  "description": "Compare 4 AI models side-by-side",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev:backend": "cd backend && npm start",
+    "dev:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build",
+    "build:backend": "echo 'Backend is already in Node.js'",
+    "install-all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "test": "echo 'No tests configured yet'",
+    "start": "npm run dev"
+  },
+  "keywords": [
+    "ai",
+    "comparison",
+    "openai",
+    "gemini",
+    "deepseek",
+    "groq"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}

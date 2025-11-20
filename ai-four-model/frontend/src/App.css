@@ -1,0 +1,157 @@
+/* App-specific styles: small set of helpers that complement Tailwind */
+
+#root { text-align: center; }
+
+.topbar { background: transparent; }
+
+.btn {
+  font-weight: 700;
+  padding: 0.5rem 0.9rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  transition: transform 140ms cubic-bezier(.2,.9,.2,1), box-shadow 140ms ease, opacity 120ms ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.btn:active { transform: translateY(1px); }
+
+.btn:focus { outline: none; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text);
+  padding: 0.45rem 0.7rem;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-600));
+  color: white;
+  box-shadow: 0 8px 20px rgba(99,102,241,0.18), inset 0 1px 2px rgba(255,255,255,0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 500ms ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(99,102,241,0.22), inset 0 1px 2px rgba(255,255,255,0.2);
+}
+
+.btn-primary:hover::before { left: 100%; }
+
+.btn-primary:active { transform: translateY(-1px); }
+
+.btn-primary[disabled] {
+  opacity: 0.5; cursor: not-allowed; box-shadow: 0 4px 12px rgba(99,102,241,0.08); transform: none;
+}
+
+.brand-mark { font-weight: 800; }
+
+/* colorful model cards with unique accents */
+.card-model-1 { --card-accent: var(--accent-indigo); }
+.card-model-2 { --card-accent: var(--accent-emerald); }
+.card-model-3 { --card-accent: var(--accent-amber); }
+.card-model-4 { --card-accent: var(--accent-rose); }
+
+.card-model-1, .card-model-2, .card-model-3, .card-model-4 {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--card) 0%, rgba(var(--card-accent-rgb), 0.03) 100%);
+}
+
+.card-model-1::before, .card-model-2::before, .card-model-3::before, .card-model-4::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--card-accent), rgba(var(--card-accent), 0.5));
+  opacity: 0.9;
+  box-shadow: 0 4px 12px rgba(var(--card-accent), 0.1);
+}
+
+.card-model-1::after, .card-model-2::after, .card-model-3::after, .card-model-4::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--card-accent), transparent);
+  opacity: 0.3;
+}
+
+/* make cards a bit more distinctive */
+.card-bg { 
+  padding: 1rem; 
+  background: var(--card); 
+  border-radius: 1rem; 
+  border: 1px solid rgba(15,23,42,0.04); 
+  transition: transform 180ms cubic-bezier(0.2, 0.9, 0.2, 1), box-shadow 180ms ease, background 180ms ease;
+}
+.card-bg:hover { 
+  transform: translateY(-8px); 
+  box-shadow: 0 20px 50px rgba(2,6,23,0.12);
+}
+
+/* card title with accent color underline */
+.card-title {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.3px;
+  position: relative;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--card-accent);
+  opacity: 0.9;
+}
+
+/* accent-colored text for model numbers */
+.model-badge {
+  background: var(--card-accent);
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+  opacity: 0.85;
+  letter-spacing: 0.5px;
+}
+
+/* compact question input box */
+.question-form { bottom: 1.5rem; }
+.question-box { 
+  padding: 0.5rem 0.75rem; 
+  background: var(--card);
+  border-radius: 9999px;
+  box-shadow: 0 10px 30px rgba(99,102,241,0.1), inset 0 1px 2px rgba(0,0,0,0.05);
+  border: 1px solid rgba(99,102,241,0.08);
+}
+.question-input { 
+  padding: 0.4rem 0.75rem; 
+  font-size: 0.875rem;
+  letter-spacing: 0.3px;
+}
+.question-btn { 
+  padding: 0.4rem 0.9rem; 
+  font-size: 0.875rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .app-container { padding-left: 0.75rem; padding-right: 0.75rem; }
+}
