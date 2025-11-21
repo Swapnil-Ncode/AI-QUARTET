@@ -165,7 +165,9 @@ export default function FourModelCompare() {
             </div>
 
             <div className="mt-2 flex-1 overflow-y-auto text-sm 
-              text-slate-700 dark:text-slate-300 whitespace-pre-wrap pr-2 response-content select-text">
+            text-slate-700 dark:text-slate-300 whitespace-pre-wrap pr-2 response-content select-text"
+                style={{ maxHeight: "260px" }}>
+
               {loadingModels[key] ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-center">
