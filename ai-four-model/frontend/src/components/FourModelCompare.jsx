@@ -71,7 +71,7 @@ export default function FourModelCompare() {
     // Fallback: read visible text from the DOM in case response shape differs
     if (!textToCopy) {
       try {
-        const el = document.querySelector(`[data-model="${key}"] .response-content`);
+        const el = document.querySelector(`[data-model='${key}'] .response-content`);
         if (el) textToCopy = el.innerText || el.textContent || "";
       } catch (e) {
         /* ignore */
@@ -164,7 +164,7 @@ export default function FourModelCompare() {
               </button>
             </div>
 
-            <div className="mt-2 flex-1 overflow-auto text-sm 
+            <div className="mt-2 flex-1 overflow-y-auto text-sm 
               text-slate-700 dark:text-slate-300 whitespace-pre-wrap pr-2 response-content select-text">
               {loadingModels[key] ? (
                 <div className="flex items-center justify-center h-full">
